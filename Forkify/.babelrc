@@ -6,9 +6,20 @@
             "targets": {
                 "browsers": [
                     "last 5 versions",
-                    "ie >= 8"
+                    "chrome >= 8"
                 ]
             }
-        }]
+        }
+       
     ]
+
+    ],
+    "plugins": [
+        ["@babel/plugin-transform-runtime",
+            {
+                "regenerator": true
+            }
+        ]
+    ]
+
 }
