@@ -11,6 +11,7 @@ import {
     renderLoader,
     clearLoader
 } from './views/base';
+
 /** Global state of the app
  * - Search object
  * - Current recipe object
@@ -19,6 +20,9 @@ import {
  */
 const state = {};
 
+/** 
+ * SEARCH CONTROLLER
+ */
 const controlSearch = async () => {
     // 1) Get query from view
     const query = searchView.getInput();
@@ -49,7 +53,6 @@ const controlSearch = async () => {
 elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
     controlSearch();
-
 });
 
 
@@ -66,7 +69,6 @@ elements.searchResPages.addEventListener('click', e => {
 /** 
  * RECIPE CONTROLLER
  */
-
 const controlRecipe = async () => {
     // Get ID from url
     const id = window.location.hash.replace('#', '');
@@ -105,34 +107,7 @@ const controlRecipe = async () => {
     }
 };
 
-
-
 ['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));
-
-
-
-
-// Handling recipe button clicks
-elements.recipe.addEventListener('click', e => {
-    if (e.target.matches('.btn-decrease, .btn-decrease *')) {
-        // Decrease button is clicked
-        if (state.recipe.servings > 1) {
-            state.recipe.updateServings('dec');
-            recipeView.updateServingsIngredients(state.recipe);
-        }
-    } else if (e.target.matches('.btn-increase, .btn-increase *')) {
-        // Increase button is clicked
-        state.recipe.updateServings('inc');
-        recipeView.updateServingsIngredients(state.recipe);
-    } else if (e.target.matches('.recipe__btn--add, .recipe__btn--add *')) {
-        // Add ingredients to shopping list
-        controlList();
-    } else if (e.target.matches('.recipe__love, .recipe__love *')) {
-        // Like controller
-        controlLike();
-    }
-});
-
 
 
 /** 
@@ -148,6 +123,25 @@ const controlList = () => {
         listView.renderItem(item);
     });
 }
+
+// Handle delete and update list item events
+elements.shopping.addEventListener('click', e => {
+    const id = e.target.closest('.shopping__item').dataset.itemid;
+
+    // Handle the delete button
+    if (e.target.matches('.shopping__delete, .shopping__delete *')) {
+        // Delete from state
+        state.list.deleteItem(id);
+
+        // Delete from UI
+        listView.deleteItem(id);
+
+        // Handle the count update
+    } else if (e.target.matches('.shopping__count-value')) {
+        const val = parseFloat(e.target.value, 10);
+        state.list.updateCount(id, val);
+    }
+});
 
 
 /** 
@@ -201,21 +195,23 @@ window.addEventListener('load', () => {
 });
 
 
-// Handle delete and update list item events
-elements.shopping.addEventListener('click', e => {
-    const id = e.target.closest('.shopping__item').dataset.itemid;
-
-    // Handle the delete button
-    if (e.target.matches('.shopping__delete, .shopping__delete *')) {
-        // Delete from state
-        state.list.deleteItem(id);
-
-        // Delete from UI
-        listView.deleteItem(id);
-
-        // Handle the count update
-    } else if (e.target.matches('.shopping__count-value')) {
-        const val = parseFloat(e.target.value, 10);
-        state.list.updateCount(id, val);
+// Handling recipe button clicks
+elements.recipe.addEventListener('click', e => {
+    if (e.target.matches('.btn-decrease, .btn-decrease *')) {
+        // Decrease button is clicked
+        if (state.recipe.servings > 1) {
+            state.recipe.updateServings('dec');
+            recipeView.updateServingsIngredients(state.recipe);
+        }
+    } else if (e.target.matches('.btn-increase, .btn-increase *')) {
+        // Increase button is clicked
+        state.recipe.updateServings('inc');
+        recipeView.updateServingsIngredients(state.recipe);
+    } else if (e.target.matches('.recipe__btn--add, .recipe__btn--add *')) {
+        // Add ingredients to shopping list
+        controlList();
+    } else if (e.target.matches('.recipe__love, .recipe__love *')) {
+        // Like controller
+        controlLike();
     }
-})
+});
